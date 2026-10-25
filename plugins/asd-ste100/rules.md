@@ -29,8 +29,9 @@ The project instructions can give the user's language. If they do not, use the l
 
 If you are not sure, a person reads the text.
 
-A subagent gives each question or text for the user to the main agent in ASD-STE100.
-The main agent translates it into the user's language before the user sees it.
+A subagent gives each question and each report for the user to the main agent in ASD-STE100.
+The main agent translates each question and each report into the user's language before the user sees it.
+A draft of a text for a person (for example, screen text or a pull request body) stays in the user's language.
 When you copy agent-only text into a text for a person, translate it.
 Do not show the ASD-STE100 text to the user, unless the user asks for it.
 
@@ -56,8 +57,9 @@ Before you write the first agent-only document of a task, make a term table.
 |---|---|
 
 - Put the table next to the documents of the task, as `glossary.md`. The project instructions can give a different location.
-- If the task has no folder for documents, put the table in the brief.
+- If the task has no folder for documents, put the table in the brief. Then write `Term table: in this brief`.
 - If the project has vocabulary documents, write each term exactly as they write it. Do not copy their definitions or code names into the table.
 - Use only the terms in the table. Add a row before you use a new term.
-- If you cannot write files, do not add a row. Write the new term and its meaning in your report. The main agent adds the row.
+- If you cannot change the table file, write the new term and its meaning in your report. The main agent adds the row.
+  This applies when there is no file, when you have no tool to write files, and when your instructions forbid the change.
 - Write the path of the table in each brief as `Term table: <path>`.
