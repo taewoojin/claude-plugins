@@ -11,6 +11,8 @@ const COMMAND = 'agent-cost'
 const PYTHON = '/usr/bin/python3'
 // 에이전트가 도는 동안 「몇 분째」가 올라가게 다시 재는 간격
 const LIVE_MS = 15_000
+// 마지막으로 켰는지 껐는지. 세션을 넘어 남아, 끈 사람에게는 다음 세션도 닫힌 채로 시작한다
+const IS_ON = 'isOn'
 
 const view = atom({ plugin: 'cost-panel', key: 'view' } as const, null)
 const transcript = atom({ plugin: 'cost-panel', key: 'transcript' } as const, null)
@@ -35,6 +37,10 @@ type Table = {
 // 재는 중에 또 부르면 끝난 뒤 한 번 더 잰다 — 그 사이에 바뀐 대상(`/agent-cost <세션>`)을 놓치지 않게
 let measuring: Promise<void> | null = null
 let isStale = false
+
+async function isUp($: EngineInterface): Promise<boolean> {
+  return (await $.ui.panes()).some(p => p.id === PANE && p.isPlaced)
+}
 
 async function exists($: EngineInterface, path: string): Promise<boolean> {
   return (await $.fs.stat(path).catch(() => undefined)) !== undefined
@@ -127,6 +133,8 @@ function refresh($: EngineInterface): Promise<void> {
 }
 
 async function measure($: EngineInterface): Promise<void> {
+  // 꺼져 있는 동안에는 재지 않는다 — 다시 켤 때 잰다
+  if ((await $.store.get(IS_ON)) === false) return
   try {
     const other = await read($, target)
     const path = other ?? (await read($, transcript)) ?? (await guessTranscript($))
@@ -180,10 +188,10 @@ export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     await $.command.register({
       name: COMMAND,
-      description: '이 세션(또는 지난 세션)의 에이전트마다 일한 시간과 비용을 옆 패널에 보인다',
+      description: '옆 패널을 켜고 끈다 — 에이전트마다 일한 시간과 비용. 세션 id를 주면 지난 세션을 띄운다',
       argumentHint: '[세션 id]',
     })
-    void $.ui.open({ id: PANE, title: TITLE, columns: 40 })
+    if ((await $.store.get(IS_ON)) !== false) void $.ui.open({ id: PANE, title: TITLE, columns: 40 })
     $.clock.every(LIVE_MS, () => {
       void (async () => {
         if ((await read($, target)) !== null) return
@@ -235,15 +243,29 @@ export const register: Register = on => {
     return done
   })
 
+  // 사람이 패널을 직접 닫으면 끈 것으로 친다
+  on('ui.close', async ($, e, next) => {
+    if (e.id === PANE && e.origin.kind === 'person') await $.store.set(IS_ON, false)
+
+    return next(e)
+  })
+
   on('command.run', { command: COMMAND }, async ($, e) => {
     const id = e.args.trim()
     if (id === '') {
+      // 이 세션을 띄운 채로 다시 치면 끈다. 지난 세션을 보던 중이면 이 세션으로 돌아온다
+      if ((await read($, target)) === null && (await isUp($))) {
+        await $.store.set(IS_ON, false)
+        await $.ui.close({ id: PANE })
+        return { text: '패널을 닫았습니다. 다음 세션도 닫힌 채로 시작하고, /agent-cost로 다시 엽니다' }
+      }
       await update($, target, () => null)
     } else {
       const path = await findSession($, id)
       if (path === null) return { text: `세션 ${id}의 기록을 찾지 못했습니다(없거나, 앞자리가 겹치는 세션이 여럿입니다)` }
       await update($, target, () => path)
     }
+    await $.store.set(IS_ON, true)
     await $.ui.open({ id: PANE, title: TITLE, columns: 40 })
     await refresh($)
 

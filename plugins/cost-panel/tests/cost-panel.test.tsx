@@ -84,11 +84,33 @@ const TABLE = {
 const HERE = '/home/me/.claude/projects/-work-repo/sess-1.jsonl'
 const RUN = { origin: { kind: 'composer' }, presentation: { isFullscreen: false, columns: 120 } } as const
 
-// 엔진 자리를 채운다. 돌린 명령을 모아 돌려준다
-function engine(on: On, isAgentRunning = true): string[][] {
-  const ran: string[][] = []
+type Ran = string[][] & { opens: () => number; store: Map<string, unknown> }
+
+// 엔진 자리를 채운다. 돌린 명령을 모아 돌려준다. `opens`는 패널을 연 횟수, `store`는 세션을 넘어 남는 값이다
+function engine(on: On, isAgentRunning = true, store: Record<string, unknown> = {}): Ran {
+  const ran = [] as unknown as Ran
+  let isOpen = false
+  let opens = 0
+  ran.opens = () => opens
+  ran.store = new Map(Object.entries(store))
+  on('store.get', (_, e) => ({ value: ran.store.get(e.key) }))
+  on('store.set', (_, e) => {
+    ran.store.set(e.key, e.value)
+    return { value: undefined }
+  })
   on('command.register', (_, e) => ({ value: { command: e.name } }))
-  on('ui.open', () => ({ value: { isPlaced: true } }))
+  on('ui.open', () => {
+    isOpen = true
+    opens += 1
+    return { value: { isPlaced: true } }
+  })
+  on('ui.panes', () => ({
+    value: isOpen ? [{ id: 'cost-panel', title: '시간과 비용', isShown: true, isFocused: false, isPlaced: true }] : [],
+  }))
+  on('ui.close', () => {
+    isOpen = false
+    return { value: undefined }
+  })
   on('session.start', (_, e) => ({ cwd: e.cwd }))
   on('classic.SessionStart', () => ({}))
   on('classic.UserPromptSubmit', () => ({}))
@@ -113,7 +135,7 @@ const measured = (ran: string[][]) => ran.filter(argv => argv[2] === 'table').ma
 
 test('/agent-cost를 치면 이 세션의 기록을 재서 옆 패널에 그린다', async ($, on) => {
   mock.clock(on)
-  const ran = engine(on)
+  const ran = engine(on, true, { isOn: false })
 
   await $.session.start({ cwd: '/work/repo', surface: 'terminal', isInteractive: true })
   const { text } = await $.command.run({ command: 'agent-cost', args: '', ...RUN })
@@ -166,3 +188,44 @@ test('합계 줄은 달러만 낸다 — 세션의 처음과 끝 사이 시간�
   const total = layout(VIEW, 40).find(l => l.text.includes('합계'))
   expect(total?.text).toBe(`  합계${' '.repeat(16)}${' '.repeat(11)}    $43`)
 })
+
+test('/agent-cost를 다시 치면 패널을 닫고, 다음 세션도 닫힌 채로 시작한다', async ($, on) => {
+  mock.clock(on)
+  const ran = engine(on)
+  await $.session.start({ cwd: '/work/repo', surface: 'terminal', isInteractive: true })
+  expect(ran.opens()).toBe(1)
+
+  const { text } = await $.command.run({ command: 'agent-cost', args: '', ...RUN })
+  expect(text?.startsWith('패널을 닫았습니다')).toBe(true)
+  expect(ran.store.get('isOn')).toBe(false)
+
+  await $.session.start({ cwd: '/work/repo', surface: 'terminal', isInteractive: true })
+  expect(ran.opens()).toBe(1)
+
+  await $.command.run({ command: 'agent-cost', args: '', ...RUN })
+  expect(ran.opens()).toBe(2)
+  expect(ran.store.get('isOn')).toBe(true)
+})
+
+test('꺼져 있는 동안에는 이벤트가 와도 재지 않는다', async ($, on) => {
+  const clock = mock.clock(on)
+  const ran = engine(on, true, { isOn: false })
+  await $.session.start({ cwd: '/work/repo', surface: 'terminal', isInteractive: true })
+  await $.classic.UserPromptSubmit({ prompt: '안녕', transcript_path: HERE })
+  await clock.advance(30_000)
+
+  expect(ran.opens()).toBe(0)
+  expect(measured(ran).length).toBe(0)
+})
+
+test('지난 세션을 보던 중 /agent-cost를 치면 닫지 않고 이 세션으로 돌아온다', async ($, on) => {
+  mock.clock(on)
+  const ran = engine(on)
+  await $.session.start({ cwd: '/work/repo', surface: 'terminal', isInteractive: true })
+  await $.command.run({ command: 'agent-cost', args: 'old-2', ...RUN })
+
+  const { text } = await $.command.run({ command: 'agent-cost', args: '', ...RUN })
+  expect(text).toBe('이 세션을 옆 패널에 띄웠습니다')
+  expect(measured(ran).at(-1)).toBe(HERE)
+})
+
