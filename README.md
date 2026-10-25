@@ -29,7 +29,12 @@ Claude Code 터미널 프롬프트에서:
 claude plugin install cost-panel --marketplace taewoojin/claude-plugins
 ```
 
-새 판으로 올리려면 셸에서 `claude plugin marketplace update taewoojin`을 돌리고 새 세션을 연다.
+새 판으로 올리려면 셸에서 마켓플레이스 목록을 새로 받은 뒤 플러그인을 올리고, 새 세션을 연다.
+
+```
+claude plugin marketplace update taewoojin
+claude plugin update cost-panel
+```
 
 「Add marketplace?」에는 `y`로 답하고, 범위는 사용자(user)를 고른다.
 
