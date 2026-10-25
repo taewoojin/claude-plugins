@@ -1,11 +1,18 @@
 {
   "name": "taewoojin",
-  "owner": { "name": "taewoojin" },
+  "owner": {
+    "name": "taewoojin"
+  },
   "plugins": [
     {
       "name": "cost-panel",
       "source": "./plugins/cost-panel",
       "description": "이 세션에서 띄운 에이전트마다 일한 시간과 비용을 채팅 옆 패널에 보인다"
+    },
+    {
+      "name": "asd-ste100",
+      "source": "./plugins/asd-ste100",
+      "description": "에이전트끼리만 읽는 문서(지시문·보고·플랜·케이스 목록)는 ASD-STE100으로, 사람이 읽는 것은 사용자 언어로 쓰게 한다"
     }
   ]
 }

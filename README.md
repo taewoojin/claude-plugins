@@ -19,13 +19,13 @@ Claude Code에서 쓰는 개인 플러그인 모음이다.
 Claude Code 터미널 프롬프트에서:
 
 ```
-/plugin install cost-panel --marketplace taewoojin/claude-plugins
+/plugin install <플러그인 이름> --marketplace taewoojin/claude-plugins
 ```
 
 셸에서:
 
 ```
-claude plugin install cost-panel --marketplace taewoojin/claude-plugins
+claude plugin install <플러그인 이름> --marketplace taewoojin/claude-plugins
 ```
 
 「Add marketplace?」에는 `y`로 답하고, 범위는 사용자(user)를 고른다.
