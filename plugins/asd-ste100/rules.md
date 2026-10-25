@@ -5,6 +5,9 @@ This rule comes from the `asd-ste100` plugin.
 Use only one document language rule at a time.
 If your context has a different document language rule from a plugin or a hook, tell the user about the conflict.
 
+An agent definition or a project instruction can name a language for one type of text.
+That instruction is more specific than this rule. Obey it, and do not report it as a conflict.
+
 ## 1. The reader sets the language
 
 Before you write a text, find who reads it.
@@ -26,11 +29,13 @@ The project instructions can give the user's language. If they do not, use the l
 
 If you are not sure, a person reads the text.
 
-The main agent translates each ASD-STE100 report into the user's language before the user sees it.
+A subagent gives each question or text for the user to the main agent in ASD-STE100.
+The main agent translates it into the user's language before the user sees it.
+When you copy agent-only text into a text for a person, translate it.
 Do not show the ASD-STE100 text to the user, unless the user asks for it.
 
-Keep the section headings that the project procedures use.
-Other agents find a section by its heading. You can write the ASD-STE100 name after the heading.
+Keep the section headings and the line labels that the project procedures or tools use.
+Other agents and scripts find them by their exact text. You can write the ASD-STE100 name after a heading.
 
 ## 2. Writing rules
 
@@ -47,10 +52,12 @@ Other agents find a section by its heading. You can write the ASD-STE100 name af
 
 Before you write the first agent-only document of a task, make a term table.
 
-| ASD-STE100 term | Term in the user's language | Code name |
-|---|---|---|
+| ASD-STE100 term | Term in the user's language |
+|---|---|
 
 - Put the table next to the documents of the task, as `glossary.md`. The project instructions can give a different location.
-- Take the terms from the vocabulary documents of the project, if they exist.
+- If the task has no folder for documents, put the table in the brief.
+- If the project has vocabulary documents, write each term exactly as they write it. Do not copy their definitions or code names into the table.
 - Use only the terms in the table. Add a row before you use a new term.
-- Give the path of the table in each brief to a subagent.
+- If you cannot write files, do not add a row. Write the new term and its meaning in your report. The main agent adds the row.
+- Write the path of the table in each brief as `Term table: <path>`.

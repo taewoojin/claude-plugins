@@ -21,7 +21,8 @@ Claude Code에서 쓰는 개인 플러그인 모음이다.
 - 규칙 본문은 `rules.md` 하나다. `SessionStart` 훅이 메인 세션에, `SubagentStart` 훅이 서브에이전트마다 넣는다.
 - 프로젝트의 지침이나 에이전트 정의에 「모든 문서는 ○○어로 쓴다」가 있으면 이 규칙과 부딪힌다. 설치한 뒤 그 줄을 지우거나 에이전트 문서를 예외로 둔다.
 - 다른 문서 언어 규칙의 플러그인과 함께 켜지 않는다. 함께 켜지면 에이전트가 충돌을 알린다.
-- `python3`가 필요하다.
+- `python3`가 필요하다. 테스트는 `python3 -m unittest discover -s plugins/asd-ste100/tests`다.
+- 사용자 범위가 아니라 **프로젝트 범위**로 켠다. 프로젝트마다 지침의 언어 줄을 맞춘 뒤에 켜야 해서다. 프로젝트의 `.claude/settings.json`에 `enabledPlugins`와 `extraKnownMarketplaces`를 넣으면 된다.
 
 ## 설치
 
