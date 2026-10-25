@@ -7,6 +7,7 @@ If your context has a different document language rule from a plugin or a hook, 
 
 An agent definition or a project instruction can name a language for one type of text.
 That instruction is more specific than this rule. Obey it, and do not report it as a conflict.
+An instruction that gives one language for all texts is not more specific. Tell the user about the conflict.
 
 ## 1. The reader sets the language
 
@@ -57,9 +58,9 @@ Before you write the first agent-only document of a task, make a term table.
 |---|---|
 
 - Put the table next to the documents of the task, as `glossary.md`. The project instructions can give a different location.
-- If the task has no folder for documents, put the table in the brief. Then write `Term table: in this brief`.
+- If the task has no folder for documents, put the table in the brief.
 - If the project has vocabulary documents, write each term exactly as they write it. Do not copy their definitions or code names into the table.
 - Use only the terms in the table. Add a row before you use a new term.
 - If you cannot change the table file, write the new term and its meaning in your report. The main agent adds the row.
   This applies when there is no file, when you have no tool to write files, and when your instructions forbid the change.
-- Write the path of the table in each brief as `Term table: <path>`.
+- In each brief, write `Term table: <path>`. If the table is in the brief, write `Term table: in this brief`.
