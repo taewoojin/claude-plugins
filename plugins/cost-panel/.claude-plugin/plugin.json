@@ -1,6 +1,6 @@
 {
   "name": "cost-panel",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "이 세션에서 띄운 에이전트마다 일한 시간과 비용을 채팅 옆 패널에 보인다",
   "types": "./types/index.d.ts"
 }
