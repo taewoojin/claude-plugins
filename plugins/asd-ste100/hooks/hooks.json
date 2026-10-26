@@ -1,0 +1,19 @@
+{
+  "description": "에이전트끼리만 읽는 문서를 ASD-STE100으로 쓰는 규칙을 메인 세션과 서브에이전트에 넣는다",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          { "type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/inject.py\"" }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          { "type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/inject.py\"" }
+        ]
+      }
+    ]
+  }
+}
