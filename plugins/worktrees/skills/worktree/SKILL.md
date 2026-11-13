@@ -50,8 +50,9 @@ Use Paseo when `paseo` is on PATH or at `/Applications/Paseo.app/Contents/Resour
 
 3. Coordinate:
    - `paseo wait <agentId>` waits until the agent is idle. `paseo logs <agentId>` shows what it did.
-   - `paseo send <agentId> "<message>"` gives a follow-up or a user answer.
+   - `paseo send <agentId> --no-wait "<message>"` gives a follow-up or a user answer. Without `--no-wait`, `send` waits until the agent finishes the message, and a long task goes over the command timeout. Use `paseo wait` to wait.
    - Do not edit files in the worktree while the work agent runs. Review its diff in the worktree before you report to the user.
+   - The main session merges the PR. Do not tell the work agent to merge. Archive stops every agent of the workspace, so a work agent that merges its own PR stops before it can report.
 
 The branch has no upstream. The first push is `git push -u origin <branch>`.
 
@@ -73,5 +74,5 @@ git worktree add --no-track -b <branch> <path from the table> origin/main
 
 ## Remove
 
-- Paseo worktree: `paseo workspace archive <workspaceId>`. Find the id with `paseo workspace ls --background --json` by `cwd`. Archive also archives the agents of the workspace, removes the folder, and keeps the local branch. Delete a merged local branch with `git branch -d`.
+- Paseo worktree: `paseo workspace archive <workspaceId>`. Find the id with `paseo workspace ls --background --json` by `cwd`. Archive also archives the agents of the workspace, removes the folder, and keeps the local branch. When an agent of the workspace runs archive, that agent stops after the command. Delete a merged local branch with `git branch -d`.
 - Git worktree: `git worktree remove <path>`, then `git branch -d <branch>` when the branch is merged.
