@@ -1,0 +1,5 @@
+{
+  "name": "worktrees",
+  "version": "0.1.0",
+  "description": "프로젝트마다 워크트리 자리와 준비 방법을 .worktrees.json 등 커밋된 파일로 두고, 어느 프로젝트에서나 같은 절차로 워크트리를 만들고 지우게 한다"
+}

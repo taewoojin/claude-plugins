@@ -13,6 +13,11 @@
       "name": "asd-ste100",
       "source": "./plugins/asd-ste100",
       "description": "에이전트끼리만 읽는 문서(지시문·보고·플랜·케이스 목록)는 ASD-STE100으로, 사람이 읽는 것은 사용자 언어로 쓰게 한다"
+    },
+    {
+      "name": "worktrees",
+      "source": "./plugins/worktrees",
+      "description": "프로젝트마다 워크트리 자리와 준비 방법을 커밋된 파일로 두고, 어느 프로젝트에서나 같은 절차로 워크트리를 만들고 지우게 한다"
     }
   ]
 }
