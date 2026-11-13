@@ -25,6 +25,16 @@ Claude Code에서 쓰는 개인 플러그인 모음이다.
 - `python3`가 필요하다. 테스트는 `python3 -m unittest discover -s plugins/asd-ste100/tests`다.
 - 사용자 범위가 아니라 **프로젝트 범위**로 켠다. 프로젝트마다 지침의 언어 줄을 맞춘 뒤에 켜야 해서다. 프로젝트의 `.claude/settings.json`에 `enabledPlugins`와 `extraKnownMarketplaces`를 넣으면 된다.
 
+### worktrees
+
+어느 프로젝트에서나 같은 절차로 작업용 워크트리를 만들고 지우게 한다. 프로젝트마다 다른 값(워크트리를 둘 자리, 설치 명령, 복사할 파일)은 그 프로젝트가 커밋한 파일에 두고, 플러그인은 그 파일을 읽는다.
+
+- `worktree` 스킬: 워크트리를 만들고, 쓰고, 지우는 절차. 코드를 바꾸기 전에 메인 작업 폴더가 아닌 새 워크트리와 브랜치에서 일하게 한다. Paseo가 있으면 Paseo로, 없으면 `git worktree`로 만든다
+- `worktree-setup` 스킬: 프로젝트 하나를 설정한다. 코드를 먼저 읽어 설치 명령·복사할 파일·워크트리를 제외해야 하는 도구를 찾고, 코드로 알 수 없는 워크트리 자리만 묻는다. 바뀔 파일을 표로 보인 뒤 승인받아 적용한다
+- `.worktrees.json`: 저장소 루트에 커밋하는 파일이다. `{ "location": "inside" }`처럼 자리를 정한다. 값은 `inside`(`<메인 작업 폴더>/.worktrees/<슬러그>`), `sibling`(`<메인 작업 폴더>-<슬러그>`), `paseo`(Paseo 기본 경로)다. 슬러그는 브랜치 이름의 `/`를 `-`로 바꾼 것이다. 설치 명령은 `paseo.json`의 `worktree.setup`, 복사할 파일은 `.worktreeinclude`에 둔다
+- Paseo 자리 플러그인 `worktree-placement`: Paseo가 워크트리를 만들 때마다 그 저장소의 `.worktrees.json`을 읽어 경로를 정한다. 파일이 없거나 깨졌으면 Paseo 기본 경로를 쓴다. `inside`는 git이 `.worktrees/`를 무시할 때만 쓴다. 기계마다 한 번 설치한다. `worktree-setup`이 안내하지만 직접 하려면 Paseo의 플러그인을 켠 뒤 셸에서 `paseo plugin install git:taewoojin/claude-plugins:plugins/worktrees/paseo/worktree-placement`를 실행한다. Git에서 받으므로 이 저장소의 기본 브랜치에 올라간 뒤부터 설치된다
+- 플러그인은 사용자 범위로 켜도 되고 프로젝트 범위로 켜도 된다. 프로젝트마다 다른 값은 범위와 상관없이 그 프로젝트의 `.worktrees.json`에서 읽는다
+
 ## 설치
 
 Claude Code 터미널 프롬프트에서:
@@ -46,6 +56,6 @@ claude plugin marketplace update taewoojin
 claude plugin update <플러그인 이름>
 ```
 
-「Add marketplace?」에는 `y`로 답하고, 범위는 사용자(user)를 고른다. asd-ste100만은 프로젝트(project) 범위를 고른다.
+「Add marketplace?」에는 `y`로 답하고, 범위는 사용자(user)를 고른다. asd-ste100만은 프로젝트(project) 범위를 고른다. worktrees는 어느 쪽이든 된다.
 
 데스크톱 앱에서는 프롬프트 옆 + → Plugins → Add marketplace에 `taewoojin/claude-plugins`를 넣고 Add plugin으로 설치한다.
